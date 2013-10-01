@@ -1,22 +1,22 @@
-#Ember Components - Legos For Your Ember Applications
+#Ember Components - Build Reuseable Legos For Your Ember Application
 
 ##Hello, Components
 
-Web components promise to bring reusability and encapsulation to the next version of JavaScript.  Fournately if you are writing an Ember.js application the power of web components is in your hands today. In fact Ember's components aim to adhere as closely to the W3C web components spec as possiable.   
+Web components promise to bring reusability and encapsulation to the next version of JavaScript. However, until mainstram browsers fully implment the ECMAScript 6 specification the power of Web Components is out of reach.  Fournately for Ember.js developersthe power of web components can be leveraged today.  Ember components share more than a similar name with Web Components; Ember's components aim to adhere as closely to the W3C Web Component spec as possiable.
 
 ##Brief Introduction To Ember
 
-Ember.js is an ambitious framework and covering it in detail is out of the scope of this article, however it is important to know about it's building blocks before we start talking about components.  
+Before we dig into components a brief intorduction to Ember.js is needed.  If you are already familiar with Ember you can skip ahead to the _Adding Components To The Story_ section.  Ember.js is an ambitious web application development framework and covering it in detail is out of the scope of this article, however the following section should give you the introduction needed to the building blocks of an Ember that is needed to start talking about components.  
 
-At a very high level Ember applications are composed of templates, routes, and controllers ( add).  Instead of having to wire all of these parts together, Ember conviently wires these parts together by sticking to strict naming conventions.  For example, lets say we want to create a part of our application the displays a XX.  Our application would have a template named XX, a route named XXRoute, and a controller named XXController.  Ember will automatically wire these parts of the application together for you.
+At a very high level Ember applications are composed of templates, routes, and controllers.  These parts are automatically wired together by Ember.js by sticking to strict naming conventions.  For example, a foo object would have a template named `foo`, a route named `FooRoute`, and a controller named `FooController`.  Our application would have a template named XX, a route named XXRoute, and a controller named XXController.  Lets take a minute to talk about each of these parts. 
 
-###Handlebars Templates
+###Templates With Handlebars
 
-The Handlebars ([http://www.handlebarsjs.com](http://www.handlebarsjs.com)) templating framework is used heavily in Ember applications.  Simple helpers and variables in handlebars are surrounded by double curley braces like so: {{this-is-a-handlebars-variable}}.  Handlebars also has block level helpers that can be applied to a block of a template and have opening and closing tags, the {{#each}} opening and {{/each}} helper is a good example of a block level helper.  
+Templates in Ember applications are written with The Handlebars ([http://www.handlebarsjs.com](http://www.handlebarsjs.com)) templating framework. Variables and helpers in handlebars templates are surrounded by double curly braces; `{{` and `}}`. In addition to the helpers that come with Handlebars Ember extends Handlebars with some Ember specific helpers, a few that you'll see a lot of in an Ember application are:  `action` helpers which send actions to routes and controlers, `link-to` helpers which are used to modify an appliations state through an applications routes, and `bind-atr` helpers that bind attributes to the properties of a controller. 
 
 ###Routes
 
-Routes in Ember manage an applications state through the browser's url. A route tells the application which model, or data, to populate it's templates with.  Each unique url in your application is controlled by a route.  
+Routes in Ember manage an applications state through the browser's url.  A route tells the application which model, or data, to populate it's templates with.  Each unique url in your application is controlled by a route.  
 
 ###Controllers
 
@@ -162,7 +162,9 @@ App.IndexController = Ember.ArrayController.extend({
 
 ###Demo
 
-[http://emberjs.jsbin.com/eQUmOfE/28/edit](http://emberjs.jsbin.com/eQUmOfE/28/edit)
+A working demo of the scrum card application can be found here: 
+
+[http://emberjs.jsbin.com/USoHuju/1/edit](http://emberjs.jsbin.com/USoHuju/1/edit)
 
 
 
