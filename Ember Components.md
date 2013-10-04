@@ -10,27 +10,27 @@ Before we dig into components a brief intorduction to Ember.js is needed.  If yo
 
 At a very high level Ember applications are composed of templates, routes, and controllers.  These parts are automatically wired together by Ember.js by sticking to strict naming conventions.  For example, a foo object would have a template named `foo`, a route named `FooRoute`, and a controller named `FooController`.  Our application would have a template named XX, a route named XXRoute, and a controller named XXController.  Lets take a minute to talk about each of these parts. 
 
-###Templates With Handlebars
+###Handlebars Templates
 
 Templates in Ember applications are written with The Handlebars ([http://www.handlebarsjs.com](http://www.handlebarsjs.com)) templating framework. Variables and helpers in handlebars templates are surrounded by double curly braces; `{{` and `}}`. In addition to the helpers that come with Handlebars Ember extends Handlebars with some Ember specific helpers, a few that you'll see a lot of in an Ember application are:  `action` helpers which send actions to routes and controlers, `link-to` helpers which are used to modify an appliations state through an applications routes, and `bind-atr` helpers that bind attributes to the properties of a controller. 
 
 ###Routes
 
-Routes in Ember manage an applications state through the browser's url.  A route tells the application which model, or data, to populate it's templates with.  Each unique url in your application is controlled by a route.  
+Routes in Ember manage the application's state through the url.  At a very high level a route tells the application which view information to display and what model (or data) to use to popluate it with.  Routes and views are bound through ember's naming conventions.  A view with a name of `Foo` will have a corresponding route named `FooRoute`, if this route does not exist Ember will create it for you, in memory, behind the scenes. 
 
 ###Controllers
 
-Controllers are used to manage the view state of an application. Ember applications have three types of controllers available to them: generic controllers, array controllers, and object controllers.  Each type of controller is disginguished by the way the underlying models are represented.  
+Controllers are used to add logic and events to an application's views. Controllers also act as proxies for a view's model data. There are three types of controllers in Ember: base controllers, array controllers, and object controllers.  Each type of controller is disginguished by the way the underlying models are represented.  
 
-Views that have their data stored in Array controllers have their models represented as an array of models and can use the {{#each}} handlebars helper to iterate through each item in the underlying array.  
+Array controllers back views that have their model data represented as an array.  Array controllers and the views backed by them have special methods available to them.  For example, a view backed by an ArrayController can use the `{{each}}` helper to loop through each of the models represented in a controller.  Array controllers also have direct access to Ember's Array methods, for example calling `this.filter()` on an ArrayController will run the filter on each of the controller's models.  
 
-Views that have their data stored in object controllers proxy data to thye model that is associted with the controller. For example, a view that refrences a property called {{name}} will have a `name` property on the controller which will by synconrized with a `name` property on the controllers model.  
+Views that have their data stored in object are represented by `ObjectControllers`.  What makes `ObjectControllers` unique is that they proxy data to thye model that is associted withit. For example, a view that refrences a variable called {{name}} will get its `name` value from the controller which will look for a `name` property on it's model.  
 
-Controllers also respond to the actions in a view.  
+Controllers are also used to respond to events triggered on a view.  In ember events are represented by `actions`.  Views use the `{{action}}` helper to send events to the controller and the controller uses an `actions` property to store callback functions for events.  
 
 ###Models
 
-Models in Ember applications can be plain JavaScript objects or representations of the much more robust ember-data framework.  
+Models in Ember applications can be plain JavaScript objects or representations of the much more robust ember-data framework.  For the sake of this article we'll use Plain Old JavaScript Objects to represent our model data. 
 
 ##Adding Components To The Story
 
