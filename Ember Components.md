@@ -30,57 +30,68 @@ Controllers are also used to respond to events triggered on a view.  In ember ev
 
 ###Models
 
-Models in Ember applications can be plain JavaScript objects or representations of the much more robust ember-data framework.  For the sake of this article we'll use Plain Old JavaScript Objects to represent our model data. 
+Models in Ember applications can be plain JavaScript objects or representations of the much more robust ember-data framework.  
 
 ##Adding Components To The Story
 
-Ember components allow developers to abstract out common display elements and reuse them in other parts of the application or even in other applications. Components are discrete chunks of your application's view with encapsulated actions and properties.  Because of this data must be explicitly passed into a compoentnt and actions must be explicitly passed out of the component into it's enclusing controller.  
+Ember components allow developers package together common display elements and functionality in an encapsulated mannor that allows them to be urused throughout an application or even in other applications. Because of this encapsulation data must be explicitly passed into a compoentnt and actions must be explicitly passed out of the component into it's enclusing controller. This is an important concept to grasp so let me put it another way.  All data that is used by a view must be maunally passed into the view through the components tag.  In addition for a component to have an event that transends the boundries of that compoennt the programmer must manually do so from the component's code. 
 
-In this article we'll build a simple backlog management application. This application will manage two backlogs: the active backlog for current work items and an archive backlog that will store completed items. Since each of these lists will be displaying backlog items as cards we'll create a reuseable Ember component to represent each card.  
+In this article we'll build a simple scrum backlog management application that utilizes the power of component.  To display this power this application will manage two different backlogs (if you are unfamiliar with the concept of a back log, just think of it as a list of items that need to be done): the active backlog which has current work items and an archive backlog that will store completed items.  In this article, I'll call each item in a backlong a "card".
+
+###Get Boostraped
+
+The quickest way to get started building an Ember application is with the [Ember Starter Kit] (https://github.com/emberjs/starter-kit/archive/v1.0.0.zip).  This is a zip file that includes Ember and all of it's dependencies.  There is also a very convienent custom JS Bin that comes with the Ember Starter Kit already configured at [http://emberjs.jsbin.com/](http://emberjs.jsbin.com/).  We'll use the JS Bin version of the starter kit in this article.
 
 ###It all starts with a template.  
 
-Ember components start with a template object that can be injected into another view using it's component name.  Like any Ember view a component's markeup is written using the  Gandlebars templating language.  Like evertying else in Ember, there is a strict naming convention that is used to define a component: it's template name must start with the word `component\`.  Following the [W3C spec](http://www.w3.org/TR/2013/WD-components-intro-20130606/#custom-element-section) Ember component names must include a hypen.   This is done to avoid potential naming conflicts with other HTML tags.  With this in mind let's create our scrum card template and give it the name of `components\scrum-card`:
+All Ember components must have a template. Like evertying else in Ember, there is a strict naming convention that must be adhered to.  The first part of this convention says that the template's name must start with the text `component\`, followed by the name of the component.  The second part of this convention is that the name of the component **must include a hyphen**.  This convention follows the [W3C spec](http://www.w3.org/TR/2013/WD-components-intro-20130606/#custom-element-section), which also declares that a web compoennt name must include a hyphen. This convention is in place to avoid potential naming conflicts with other HTML tags.  
+
+Keeping the naming conventions in mind its time to create the scrum card template and give it the name of `components\scrum-card`.  Add the following code to your HTML tab:
 
 ```
   <script type="text/x-handlebars" data-template-name="components/scrum-card">
     <article>
-        <h1 class="card-title">{{ card.title }}</h1>
+        <h1 class="card-title">{{card.title}}</h1>
         <ul>
-        {{ #each card.tasks }}
+        {{#each card.tasks}}
           <li>
             <div>
-              <div class="inline" >{{ input type="checkbox" checked=completed }}</div>
-              <div {{ bind-attr class=":inline completed:isCompleted" }}>
-                <div><strong>{{ title }}</strong></div>
-                <div><label>Assigned to: </label>{{ assignedTo }}</div>
+              <div class="inline" >{{input type="checkbox" checked=completed }}</div>
+              <div {{bind-attr class=":inline completed:isCompleted"}}>
+                <div><strong>{{title}}</strong></div>
+                <div><label>Assigned to: </label>{{assignedTo}}</div>
               </div>
             </div>
           </li>
-        {{ else }}
-        	<li>There are no tasks for this card.</li>
-        {{ /each }}
+        {{else}}
+          <li>There are no tasks for this item</li>
+        {{/each}}
         </ul>
+        {{#unless card.complete}}
+        <button {{action 'done' card }}>Done</button>
+        {{/unless}}
     </article>
   </script>
 ```
 
-####Breaking down the template
+####Lets break that down
 
-Ther are a lot of things going on in this template so let's spend some time going over them before we continue.  One of the first thing's you'll notice is that it is refrencing properties of a `card` object.  **This object must be explicitly passed into the component, the component has no access to the data that is available to it's parent view.**  
+There are a lot of things going on in this template so let's spend some time going over each of them before we continue.  One of the first thing's you'll notice is that the handlebars expressions are refrencing properties of a `card` object. **This object must be explicitly passed into the component upon creation, it has no access to the data that is available to it's parent view.**  This is different than any other Ember view where a view has access to the properties of it's controller.  
 
-A few lines down this template is making use of the `{{#each}}` handlebars helper  This helper will output the html between the opening and closing each tags one time for each item in an array. Near the end of the loop there is also the `{{else}}` tag, it's content's will be displayed if the array passed into the each block is empty.  
+A few lines down this template is making use of the `{{#each}}` handlebars helper.  This is an Array helper and will loop through all the items in the array displaying the HTML between the opening and closing `each` tags once for each item in an array. Near the end of the loop there the template also uses  `{{else}}` tag.  The content inside the `else` tag only will be displayed if the array passed into the each block is empty or does not exist.
 
-A few lines into our `{{#each}}` statement there is an Ember {{input}} view helper object: `{{input type="checkbox" checked=completed }}`.  This piece of code is particularlay interesting becuase it will reach out of the templates encapsulation and update a property on the object that is being passed into the template.  The next line includes a bit of Ember magic as well by using the `{{bind-attr}}` helper to bind an elements class name to the property of an object.  In this case if the object's completed property is true the `div` will get a class of `isCompleted`.  
+This view also makes use of a special type of input tag called an Ember input view helper : `{{input type="checkbox" checked=completed }}`.  Ember view helpers differ from standard html input tags becuase they allow developers to easily bind properties to an existing model.  In this case, the models `completed` property is bound to the checkbox's `checked` property.  This piece of code is also particularlay interesting becuase it seemingly breaks the components tight encapsulation and will update the values of the object that was passed into the component.
+
+The next line includes another Ember specific Handlebars helper, `{{bind-attr}}`.  This helper to binds an elements class name to the property of an object. In this case the `div` will get a class of `isCompleted` when the model's completed property is true.  Looking back to the explanation of the Ember input view helper you'll see that when the input is checked the value of the completed property will change which will also change the class of the div.  That was a mouthful, perhaps loking at the appplication [here](http://emberjs.jsbin.com/USoHuju/1/edit) will give you a clearer picture.  
  
 
 ####Adding the Component Into Templates
 
-Once the component template is defined inserting it into a template is as easy as adding a variable to your template; just add insert it using the handlebars variable syntax.  To insert our scrum card component, we'd use the following syntax `{{scrum-card}}`.  Again, becuase components are encapsulated they do not have direct access to the variables that their containing  template has access to.  
+Once the component is defined inserting it into a template is as easy as adding an expression to a Handlebars template. In order to add scrum-card component to a tempate simply add the following code in a handlebars template:  `{{scrum-card}}`.  Since the component does not have access to the same controller data that it's parent template has the component will not have any of it's expressions replaced by valid data. 
 
-Properties are passed into components by adding them to the component's helper tag as key/value pairs.  Looking back at our component's template, it makes heavy use of a object variable called `card`.  In order to pass the data for a card into our component we'd simpley add a `card=value` inside the `{{scrum-card}}` helper.  _Note: the name of the variable that has the data outside of the component can be named anything, it just has to be passed into the component with the correct name.  
+In order to provide our component with data properties are passed into a component by adding them to the component's expression as attributes.  Looking back at our component, it makes heavy use of a variable called `card`.  In order to pass the card data into the component simpley add a `card=` attribute inside the `scrum-card` helper and set it's value to a valid card object.  _Note: the name of the variable that holds the data does not have to be the same name as the variable used in the component.  The right hand side of the attribute must be the name of the variable used in the component and the left hand side of the attribute can be any valid variable._  
 
-Below is an example of looping through an ArrayController's model and passing in `card` information into the `scrum-card` component:
+The example below loops through an ArrayController's model and passing in the required `card` information into the `scrum-card` component (Notice how the card information passed into the controller is in a variable called pbi):
 
 ```
   <script type="text/x-handlebars" data-template-name="index">
@@ -94,12 +105,9 @@ Below is an example of looping through an ArrayController's model and passing in
 
 ###The Component Object
 
-Perhaps by this point you've asked yourself a few questions.  What element will ember wrap my component in when it's inserted into the DOM?  How do I get my components to respond to user interactions?  
+Perhaps by this point you've asked yourself a few questions. Can I control what element Ember will use to wrap my component when it's inserted into the DOM?  How do I get my components to respond to events?  Where are properties that only my controller uses stored?  The answer to all of these questions lies in the `Ember.Component` object.  
 
-The `Ember.Component` object solves 
-Because components are encapsulated, actions triggered on views do not bubble past the boundries of the view.  The `Ember.Component` object solves this issue.  In addition when Ember inserts a component into the DOM it is wrapped in a `<div>` element by default
-
-The component object is created by extending the `Ember.Component` object.  You won't be surprised to know that the name of this object is determined by Ember's conventions, a component's object should be named: <i>ComponentName</i>Component (note that the hyphen based naming convention is replaced by a camel cased naming convention).  Looking back again at our `scrum-card` component example the Component Object that would back it would be named `ScrumCardComponent`.  
+In order to create a `Ember.Component` object for a component just extend `Ember.Component`. As with most things in Ember, naming conventions will determin this object's name, it is a camel case representation of the component's name. The follwing code creates the component object for our scrum card.
 
 ```
 App.ScrumCardComponent = Ember.Component.extend( {
@@ -107,32 +115,42 @@ App.ScrumCardComponent = Ember.Component.extend( {
 } );
 ```
 
-###Responding To Actions
+####Sending and Responding to Actions
 
-In order to send actions to the component object the `{{action 'actionName' }}` helper is used.  Action helpers are nested inside of HTML tags, for example to send an action called _itWasClicked_ to the a component when a user clicks on a `<div>` I'd add the following to my handlebars template: `<div {{action 'itWasClicked'}}>`.  
+In order to send actions to the component object the `{{action 'actionName' }}` helper is used.  Action helpers are nested inside of HTML tags.  For example, to send an action called _itWasClicked_ to the a component's object when a user clicks on a specific `<div>` the following markup should be added a component's template: `<div {{action 'itWasClicked'}}>`.  
 
-In order to have our Component Object respond to actions it must have a property named `actions` (see the [ember documentation]((http://emberjs.com/guides/templates/actions/) for more information about implementing actions in templates and controllers ).  Each action property will have the same name as defined in the action with the value of it being a function that will get executed when the action is triggered. 
+In order to have our Component Object respond to actions it must have a property named `actions` which will be an object (see the [ember documentation]((http://emberjs.com/guides/templates/actions/) for more information about implementing actions in templates and controllers ).  Each property of the action object will have the same name as the action defined in the action helper and the value of each property is a function that will be executed when the event is triggered.
 
-To demonstrate this let's add a button to our application that will allow us to mark a card as "done".  First we need to add mark up to our template, after the `ul` that makes up our tasks list.  
+To demonstrate this let's add a button to our scrum card component that will allow us to mark a card as "done". In order to do this we'll add a `<button>` to our template that will send the "done" action to our component. In order need to tell the action handler know what card we are marking as done we'll pass the card variable to the action by adding it as an attribute to the action helper.
 
+In order to make our UI as simple to use as possiable we'll hide the done button for tasks that have already been completed. To do this Handlebars provides us with the `{{#unless}}` block helper.  This helper tells Handlebars to display the contents between the `{{#unless}}` and `{{/unless}}` tags only if the value of the property passed into the  helper is `falsy`<sup>1</sup>.  The mirror image of `{{unless}}` is the `{{if}}` and `{{/if}}` helpers which display information only if the value or the property passed into the helper is `truthy`<sup>2</sup>.
+
+Using what we just learned lets add the done button to our scrum-card by adding the following markup:
 ```
 {{ #unless card.complete }}
   <button {{ action 'done' card }}>Done</button>
 {{ /unless }}
 ```      
-In addition to our action helper  the end of our template's markup we use the `{{#unless}}` block helper.  This tells handlebars to display the contents between the `{{#unless}}` and `{{/unless}}` tags only if the property passed into the `{{unless}}` helper is `false`.  If we wanted to display the markup if the property was `true` we could have used the Ember `{{#if}}` helper.  
 
-###Passing Events To Controllers
+We'll also create our object controller and tell it to respond to `done` actions by adding the following JavaScript to our application:
 
-There are a number or situations where an application's controllers need respond to events from a component. In order to do this we need to explicitly tell our templates what actions to expect by setting an `action` attribute in our template declaration.  Events won't be sent by the component until the component object calls the `sendAction()` method.   
+`
+//add the javascript here you fool, but leave out the arguments
+`
+
+####Passing Events To Controllers
+
+There are a number or situations where an application's controllers need respond to events from a component. In order to do this we need to explicitly tell the template that includes the component what actions the component will send by setting an `action` attribute in our template invocation. These events are then sent to the controller through a `sendAction()` method implmemented on the component's object which is then responded to by a method in the controller's action object.     
+
+Lets start to add this functionality to our scrum card component by adding a `action` attribute to our invocation markup and giving it a value of `markCardDone` (it will be up to the parent template's controller to respond to the `markdCardDone` event): 
 
 ```
  {{ scrum-card card=card action="markCardDone" }}
 ```
 
-In the scrum card application our controllers will need additional information attached to an event, in this case exactly what card was clicked on.  In order to do this we have to call our `sendAction` method with at least two parameters; the first one is the string of `action` and any additional parameters are passed after.  Controllers can intercept and respond to actions by adding them to their actions object.  Lets look at how our scrum card application sends "done" events to the controller object and then along to a controller.
+Before we can tell the controller to respond to the `markCardDone` action will also need to know what card was clicked on. In order to do this  the `sendAction` method needs to be refactored to add two parameters: the first one is a string with the text `action` and the second one is the card that was clicked on. To send more than one parameter into the controller simply add them as additional parameters to the `sendAction` method.  Controllers can intercept and respond to actions by adding them to their actions object.  Lets look at how our scrum card application sends "done" events to the controller object and then along to a controller.
 
-First we add the action to our Object Controller:
+First we add the action to our component's object:
 
 ```
 App.ScrumCardComponent = Ember.Component.extend({
@@ -144,7 +162,7 @@ App.ScrumCardComponent = Ember.Component.extend({
 } );
 ```
 
-Second we rrespond to the action in our application's controller:
+Second we will rspond to the action in our application's controller, accepting the `card` information as an argument:
 
 ```
 App.IndexController = Ember.ArrayController.extend({
@@ -157,7 +175,15 @@ App.IndexController = Ember.ArrayController.extend({
 });
 ```
 
-####Block Form Templates 
+####Changing the Component's HTML Element
+
+Lets say we want to wrap our component in a more semantic HTML tag like `<section>`.  To do this simply add a `tagName` property to the component object like so:
+
+`tagName : 'section'`
+
+##There's Much More to Learn
+
+This tutorial covered many of the basic use caes of Ember components, but its far from an exhaustive review.  For example you can build components that allow users to pass in their own markup for part of all of the component using block level compoonent tags or bind differnet class information to our component based on the values of it's properties.  To read more on components check out the excellent documentation on the Ember.js website at [http://www.emberjs.com#components](http://www.emberjs.com#components).  I'd also recommend you take a few hours and walk through the [Getting Started](http://wwww.emberjs.com#gettingstarted) guide which will walk you through building a complete Todo application using components.
 
 
 ###Demo
@@ -165,6 +191,8 @@ App.IndexController = Ember.ArrayController.extend({
 A working demo of the scrum card application can be found here: 
 
 [http://emberjs.jsbin.com/USoHuju/1/edit](http://emberjs.jsbin.com/USoHuju/1/edit)
+
+#add the tag name to the demo!!
 
 
 
