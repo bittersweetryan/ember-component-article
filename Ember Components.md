@@ -2,13 +2,13 @@
 
 ##Hello, Components
 
-Web components promise to bring reusability and encapsulation to the next version of JavaScript. However, until mainstram browsers fully implment the ECMAScript 6 specification the power of Web Components is out of reach.  Fournately for Ember.js developersthe power of web components can be leveraged today.  Ember components share more than a similar name with Web Components; Ember's components aim to adhere as closely to the W3C Web Component spec as possiable.
+Web components promise to bring reusability and encapsulation to the next version of JavaScript. The bad news is that until mainstram browsers fully implment the ECMAScript 6 standards that make up web components, their power is out of reach.  Fournately for Ember.js developers the power of web components can be leveraged today in the form of Ember components.  Ember's components share more than a similar name with Web Components; Ember's components aim to adhere as closely to the W3C Web Component spec as possiable.
 
 ##Brief Introduction To Ember
 
-Before we dig into components a brief intorduction to Ember.js is needed.  If you are already familiar with Ember you can skip ahead to the _Adding Components To The Story_ section.  Ember.js is an ambitious web application development framework and covering it in detail is out of the scope of this article, however the following section should give you the introduction needed to the building blocks of an Ember that is needed to start talking about components.  
+Before we dig into Ember components a brief intorduction to Ember.js is needed (if you are already familiar with Ember you can skip ahead to the _Adding Components To The Story_ section). Ember.js is an ambitious web application development framework and covering it in detail is out of the scope of this article, however the following section should give you the knowledge of Ember's building blocks of an Ember that is needed to start talking working with components.  
 
-At a very high level Ember applications are composed of templates, routes, and controllers.  These parts are automatically wired together by Ember.js by sticking to strict naming conventions.  For example, a foo object would have a template named `foo`, a route named `FooRoute`, and a controller named `FooController`.  Our application would have a template named XX, a route named XXRoute, and a controller named XXController.  Lets take a minute to talk about each of these parts. 
+At a very high level Ember applications are composed of templates, routes, and controllers.  Ember automatically wires all of these components together by sticking to strict naming conventions.  For example, a `foo` object would have a template named `foo`, a route named `FooRoute`, and a controller named `FooController`.  Let's take a look at each of these parts. 
 
 ###Handlebars Templates
 
@@ -32,7 +32,7 @@ Controllers are also used to respond to events triggered on a view.  In ember ev
 
 Models in Ember applications can be plain JavaScript objects or representations of the much more robust ember-data framework.  
 
-##Adding Components To The Story
+##Back to Components
 
 Ember components allow developers package together common display elements and functionality in an encapsulated mannor that allows them to be urused throughout an application or even in other applications. Because of this encapsulation data must be explicitly passed into a compoentnt and actions must be explicitly passed out of the component into it's enclusing controller. This is an important concept to grasp so let me put it another way.  All data that is used by a view must be maunally passed into the view through the components tag.  In addition for a component to have an event that transends the boundries of that compoennt the programmer must manually do so from the component's code. 
 
@@ -135,7 +135,12 @@ Using what we just learned lets add the done button to our scrum-card by adding 
 We'll also create our object controller and tell it to respond to `done` actions by adding the following JavaScript to our application:
 
 `
-//add the javascript here you fool, but leave out the arguments
+App.ScrumCardComponent = Ember.Component.extend({
+  actions : {
+    done : function(){
+      this.sendAction( );
+    }
+  }
 `
 
 ####Passing Events To Controllers
@@ -148,7 +153,7 @@ Lets start to add this functionality to our scrum card component by adding a `ac
  {{ scrum-card card=card action="markCardDone" }}
 ```
 
-Before we can tell the controller to respond to the `markCardDone` action will also need to know what card was clicked on. In order to do this  the `sendAction` method needs to be refactored to add two parameters: the first one is a string with the text `action` and the second one is the card that was clicked on. To send more than one parameter into the controller simply add them as additional parameters to the `sendAction` method.  Controllers can intercept and respond to actions by adding them to their actions object.  Lets look at how our scrum card application sends "done" events to the controller object and then along to a controller.
+Before we can tell the controller to respond to the `markCardDone` action will also need to know what card was clicked on. In order to do this  the `done` method needs to be refactored to add two parameters to `sendAction`: the first one is a string with the text `action` and the second one is the card that was clicked on. To send more than one parameter into the controller simply add them as additional parameters to the `sendAction` method.  Controllers can intercept and respond to actions by adding them to their actions object.  Lets look at how our scrum card application sends "done" events to the controller object and then along to a controller.
 
 First we add the action to our component's object:
 
@@ -179,20 +184,24 @@ App.IndexController = Ember.ArrayController.extend({
 
 Lets say we want to wrap our component in a more semantic HTML tag like `<section>`.  To do this simply add a `tagName` property to the component object like so:
 
-`tagName : 'section'`
+```
+App.ScrumCardComponent = Ember.Component.extend({
+	tagName : 'section',
+	…
+} );
+```
 
 ##There's Much More to Learn
 
-This tutorial covered many of the basic use caes of Ember components, but its far from an exhaustive review.  For example you can build components that allow users to pass in their own markup for part of all of the component using block level compoonent tags or bind differnet class information to our component based on the values of it's properties.  To read more on components check out the excellent documentation on the Ember.js website at [http://www.emberjs.com#components](http://www.emberjs.com#components).  I'd also recommend you take a few hours and walk through the [Getting Started](http://wwww.emberjs.com#gettingstarted) guide which will walk you through building a complete Todo application using components.
+This tutorial covered many of the basic use caes of Ember components, but its far from an exhaustive review.  For example you can build components that allow users to pass in their own markup for part of all of the component using block level compoonent tags or bind differnet class information to our component based on the values of it's properties.  To read more on components check out the excellent documentation on the Ember.js website at [http://emberjs.com/guides/components/](http://emberjs.com/guides/components/).  I'd also recommend you take a few hours and walk through the [Getting Started](http://emberjs.com/guides/getting-started/) guide which will walk you through building a complete Todo application using components.
 
 
 ###Demo
 
 A working demo of the scrum card application can be found here: 
 
-[http://emberjs.jsbin.com/USoHuju/1/edit](http://emberjs.jsbin.com/USoHuju/1/edit)
+[http://emberjs.jsbin.com/abOviQu/1/edit](http://emberjs.jsbin.com/abOviQu/1/edit)
 
-#add the tag name to the demo!!
 
 
 
